@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="UTF-8" />
@@ -17,28 +17,30 @@
 </head>
 
 <body>
-  <header></header>
+  <header>
+    <img src="https://colorlib.com/etc/regform/colorlib-regform-20/images/registration-form-4.jpg" alt="">
+  </header>
   <main>
-    <section>
+    <section id="form_registration">
       <form id="registration">
-        <article class="cardWelcome">
-          <p class="welcome">Welcome!!!!</p>
-        </article>
-        <label class="labelGoogle" for="googleBtn">
+        <h2 class="signUp">Registro</h2>
+        <label class="input__container googleBtn" for="googleBtn">
           <span class="googleIcon iconify" data-icon="flat-color-icons:google"></span>
-          <input id="googleBtn" type="button" name="googleBtn" value="Sign Up with Google">
+          <input class="input" id="googleInput" type="button" name="googleBtn" value="Google">
         </label>
-        <label for="email">
+        <span class="divider" data-icon="mdi:password">or</span>
+        <label class="input__container" for="email">
           <span class="iconify" data-icon="material-symbols:mail"></span>
-          <input  name="userEmail" id="email" placeholder="Email" required>
+          <input class="input" id="email"  name="userEmail" placeholder="Correo" required>
         </label>
-        <label for="password">
+        <label class="input__container" for="password">
           <span class="iconify" data-icon="mdi:password"></span>
-          <input type="password" name="userpassword" id="password" placeholder="Password" required>
+          <input class="input" name="userpassword" type="password" id="password" placeholder="Contraseña" required>
         </label>
-          <button id="signUp" class="btn SubmitBtn" type="submit">Sign up</button>
+
       </form>
-    </section>
+
+    <!-- </section>
     <section class="container">
       <h1 class="main-title">Our Products</h1>
       <p class="min-content">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores corporis ipsa tempora,
@@ -110,7 +112,7 @@
             <p class="card__description">Illo, dolorem magnam?</p>
           </section>
         </article>
-        
+
         <article class="card stacked">
           <img src="assets/images/product.png" alt="" class="card__img">
           <section class="card__content">
@@ -122,10 +124,13 @@
 
       </section>
 
-    </section>
+    </section> -->
 
   </main>
-  <footer></footer>
+  <footer>
+    <button id="signUp" class="btn fillBtn" type="submit">registrarte</button>
+    <button id="signIn" class="btn outlineBtn" type="submit">Iniciar sesión</button>
+  </footer>
   <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js"></script>
