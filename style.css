@@ -14,3 +14,17 @@ img {
   max-width: 100%;
   display: block;
 }
+
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.card {
+  border: 3px solid hotpink;
+}
+
+.card__img {
+  aspect-ratio: 1 / 1;
+}
