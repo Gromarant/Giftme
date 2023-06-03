@@ -23,25 +23,23 @@
   <main>
     <section id="form_registration">
       <form id="registration">
-        <h2 class="signUp">Registro</h2>
-        <label class="input__container googleBtn" for="googleBtn">
+        <h2 class="signUp">Acceso</h2>
+        <label class="input__container" id="googleBtn" for="googleBtn">
           <span class="googleIcon iconify" data-icon="flat-color-icons:google"></span>
           <input class="input" id="googleInput" type="button" name="googleBtn" value="Google">
         </label>
         <span class="divider" data-icon="mdi:password">or</span>
         <label class="input__container" for="email">
-          <span class="iconify" data-icon="material-symbols:mail"></span>
+          <span class="iconify gray" data-icon="material-symbols:mail"></span>
           <input class="input" id="email"  name="userEmail" placeholder="Correo" required>
         </label>
         <label class="input__container" for="password">
-          <span class="iconify" data-icon="mdi:password"></span>
+          <span class="iconify gray" data-icon="mdi:password"></span>
           <input class="input" name="userpassword" type="password" id="password" placeholder="Contraseña" required>
         </label>
-
       </form>
-
-    <!-- </section>
-    <section class="container">
+    </section>
+    <!-- <section class="container">
       <h1 class="main-title">Our Products</h1>
       <p class="min-content">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores corporis ipsa tempora,
         blanditiis nam
@@ -128,8 +126,8 @@
 
   </main>
   <footer>
-    <button id="signUp" class="btn fillBtn" type="submit">registrarte</button>
-    <button id="signIn" class="btn outlineBtn" type="submit">Iniciar sesión</button>
+    <button id="signUp" class="btn fillBtn">registrarte</button>
+    <button id="signIn" class="btn outlineBtn">Iniciar sesión</button>
   </footer>
   <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-firestore.js"></script>

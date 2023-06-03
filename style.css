@@ -109,6 +109,9 @@ input {
 .googleBtn {
   justify-content: center;
 }
+.gray {
+  color: #898787;
+}
 
 #registration {
   margin: 0 1rem;

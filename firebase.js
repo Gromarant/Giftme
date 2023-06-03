@@ -1,10 +1,11 @@
 //firebase configuración
 //-----> FIREBASE_CONFIGURATION HERE
 
+
 //Inicialización de Firebase y variables
 firebase.initializeApp(firebaseConfig);
-// const userEmail = document.querySelector('#email');
-// const userPassword = document.querySelector('#password');
+const userEmail = document.querySelector('#email');
+const userPassword = document.querySelector('#password');
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -18,7 +19,7 @@ const userSignUp = async (email, password) => {
     .then(userCredential => {
       let user = userCredential.user;
       console.log(`se ha registrado ${user.email} ID:${user.uid}`)
-      initializeUserDocument(user);
+      // initializeUserDocument(user);----> Creación de documento usuario firestore
       saveUser(user);
     })
     .catch((error) => {
@@ -26,20 +27,15 @@ const userSignUp = async (email, password) => {
       let errorMessage = error.message;
       console.log("System error:" +  errorCode + ' ' + errorMessage);
     });
+    userEmail.value = '';
+    userPassword.value = '';
 };
-      
-const saveUser = (user) => localStorage.setItem('currentUser', JSON.stringify(user.uid));
-const getUser = () => JSON.parse(localStorage.getItem('currentUser'));
-
-
 
 //Datos de registro
 const dataToSignUp = (e) => {
   e.preventDefault();
-  let email = e.target.elements.email.value;
-  let password = e.target.elements.password.value;
 
-  password ? userSignUp(email, password) : alert("error password");
+  password ? userSignUp(userEmail.value, userPassword.value) : alert("error password");
 }
 
 //Acceso a usuario registrado con correo
@@ -95,9 +91,19 @@ const userSignOut = async () => {
 //Estado de usuario
 firebase.auth().onAuthStateChanged(function (user) {
   if (user) {
-    navigateToHome();
+    // navigateToHome();
   } 
   else {
     console.log('user');
   }
 });
+
+const saveUser = (user) => localStorage.setItem('currentUser', JSON.stringify(user.uid));
+const getUser = () => JSON.parse(localStorage.getItem('currentUser'));
+
+//Events
+document.querySelector('#signIn').addEventListener('click', userSignIn);
+// document.querySelector('#logOut').addEventListener('click', userSignOut);
+// document.querySelector('#play').addEventListener('click', navigateToQuiz);
+document.querySelector('#googleBtn').addEventListener('click', signInWithGoogle);
+document.querySelector('#signUp').addEventListener('click', dataToSignUp);
