@@ -112,6 +112,13 @@ input {
 .gray {
   color: #898787;
 }
+.error_message {
+  font-size: var(--font-size-small);
+}
+.error_message > span {
+  color: rgb(230, 12, 12);
+  font-size: var(--font-size-medium);
+}
 
 #registration {
   margin: 0 1rem;

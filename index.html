@@ -12,8 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&family=Heebo:wght@100..900&display=swap"
     rel="stylesheet">
-
-  <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -31,13 +30,14 @@
         <span class="divider" data-icon="mdi:password">or</span>
         <label class="input__container" for="email">
           <span class="iconify gray" data-icon="material-symbols:mail"></span>
-          <input class="input" id="email"  name="userEmail" placeholder="Correo" required>
+          <input class="input" id="email"  name="userEmail" type="email" placeholder="Correo" required>
         </label>
         <label class="input__container" for="password">
           <span class="iconify gray" data-icon="mdi:password"></span>
           <input class="input" name="userpassword" type="password" id="password" placeholder="Contraseña" required>
         </label>
       </form>
+      <p class="error_message"></p>
     </section>
     <!-- <section class="container">
       <h1 class="main-title">Our Products</h1>
