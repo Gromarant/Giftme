@@ -1,13 +1,5 @@
 //firebase configuración
 //-----> FIREBASE_CONFIGURATION HERE
-const firebaseConfig = {
-  apiKey: "AIzaSyBAF84mZM38GNZjZ4hdE-28FnHDM77F5rg",
-  authDomain: "quizeax2.firebaseapp.com",
-  projectId: "quizeax2",
-  storageBucket: "quizeax2.appspot.com",
-  messagingSenderId: "397962594102",
-  appId: "1:397962594102:web:5740a7404606e1bcd01597"
-};
 
 
 //Inicialización de Firebase y variables
@@ -16,43 +8,9 @@ const userEmail = document.querySelector('#email');
 const userPassword = document.querySelector('#password');
 const auth = firebase.auth();
 const db = firebase.firestore();
-let docRef;
 
-// query para acceder a una referencia
-const createDocRef = (id) => docRef = db.doc(`users/${id}`);
 
-const readOneUser = (id) => {
-  
-  db.collection('users')
-    .doc(id)
-    .get()
-    .then( user => console.log(user.data().userName))
-    .catch(error => {
-      console.log("Error getting contacts:", error);
-    });
-};
-readOneUser(docRef);
-
-function readOne(id) {
-  db.collection('users')
-    .doc(id)
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        console.log("Document data:", doc.data());
-        printPhoto(doc.data().title, doc.data().url, doc.id);
-      } else {
-        console.log("No such document!");
-      }
-    })
-    .catch((error) => {
-      console.log("Error getting document:", error);
-    });
-};
-// contactList.forEach(contact => {
-//     printContact(contact.id, contact.data().name, contact.data().email, contact.data().message, contact.data().image);
-// })
-//Registro de usuario ------------------------------
+// //Registro de usuario ------------------------------
 const userSignUp = async (email, password) => {
   cleanErrorMessage();
 
@@ -61,12 +19,14 @@ const userSignUp = async (email, password) => {
     .then(userCredential => {
       let user = userCredential.user;
       console.log(`se ha registrado ${user.email} ID:${user.uid}`)
-      createUserDocument(user.uid, user.email);
+      createUserDocument(user.email, user.email);
       createDocRef(user.uid);
-      saveUser(user.uid);
+      saveCurrentUserId(user.uid);
     })
     .catch((error) => {
       let errorCode = error.code;
+      let errorMessage = error.message;
+      console.log(errorCode, errorMessage);
     });
     userEmail.value = '';
     userPassword.value = '';
@@ -79,11 +39,13 @@ const userSignIn = async () => {
   auth.signInWithEmailAndPassword(signInEmail, signInPassword)
     .then(userCredential => {
       const user = userCredential.user;
-      console.log(`your have login as ${user.email} ID:${user.uid}`);
+      console.log(`Iniciaste sesión como: ${user.email} ID:${user.uid}`);
     })
     .catch(error => {
-      console.log("Error login:", error.message);
+      console.log("Error iniciando sesión:", error.message);
     })
+    userEmail.value = '';
+    userPassword.value = '';
 };
 
 //Registro/acceso con Google
@@ -93,20 +55,21 @@ const signInWithGoogle = () => {
   firebase.auth().signInWithRedirect(provider);
   firebase.auth()
   .getRedirectResult()
-  .then((result) => {
+  .then(result => {
     if (result.credential) {
       /** @type {firebase.auth.OAuthCredential} */
       const credential = result.credential;
       const token = credential.accessToken;
       const user = result.user;
-      // saveUser(user);
     }
   })
-  .catch((error) => {
+  .catch(error => {
     let errorCode = error.code;
     let errorMessage = error.message;
     let email = error.email;
     let credential = error.credential;
+    console.log("Error al ingresar: ", errorCode, errorMessage);
+    console.log("Error usuario o contraseña: ", email, credential);
   });
 }
 
@@ -114,64 +77,78 @@ const signInWithGoogle = () => {
 const userSignOut = async () => {
   let user = await firebase.auth().currentUser;
 
-  firebase.auth().signOut().then(() => {
-    console.log("GoodBye: " + user.email)
-    locationbar.reload()
-  }).catch((error) => {
-    console.log("Error with log out: " + error);
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+    console.log("hata Luego: " + user.email + "!!!")
+    location.reload()
+  })
+  .catch((error) => {
+    console.log("Error cerrando sesión: " + error);
   });
 };
 
 //Estado de usuario
-firebase.auth().onAuthStateChanged(function (user) {
+firebase
+  .auth()
+  .onAuthStateChanged(function (user) {
   if (user) {
-    // navigateToHome();
+    console.log('Existe el usuario');
+    console.log(user.email);
   } 
   else {
-    console.log('user');
+    console.log('No hay usuario activo');
   }
 });
 
+// //-------------------C.R.U.D-------------------------
+const usersRef = db.collection('users');
+
+// obtener id de un registro/user   *****funciona
+const getDocumentId = (userId) => {
+
+  db.collection('users').where('id', '==', userId)
+    .get()
+    .then( querySnapshot => {
+      querySnapshot.forEach((doc) => console.log('document_id', doc.id));
+  })
+}
+let docId = getDocumentId('vauUj4ghIlZWixIZaIU0VLxWnMz2');
 
 
-//-------------------C.R.U.D-------------------------
+//------------accede a el array de listas, datos en tiempo real ***** 
+//lee una propiedad particular-----> listas
+const getCurrentData = async(docId, prop) => {
 
-const saveUser = (user) => localStorage.setItem('currentUser', JSON.stringify(user.uid));
-const getUser = () => JSON.parse(localStorage.getItem('currentUser'));
+  let data = await usersRef.doc(docId)
+    .onSnapshot((doc) => `${doc.data()}.${prop}`);
+  return data;
+}
+getCurrentData("FOR5QDG8FqLU71BG55Ou", 'lists');
 
-const createItem = (itemProp) => {
-  let item = {
-    itemName,
-    id,
-    imageUrl,
-    price,
-    description,
-    type,
-    address,
-  }
-  return item;
+
+//Actualiza datos de un usuario
+const updateUser = async(docId, newData) => {
+  let user = await usersRef.doc(docId);
+
+  return user.update(newData)
+  .then(() => {
+      console.log("Document successfully updated!");
+  })
+  .catch((error) => {
+      console.error("Error updating document: ", error);
+  });
 }
 
-const createList = (listProp) => {
-  let list =  {
-    listName: '',
-    items: [],
-  }
-  return list;
-}
 
-const createUserDocument = (id, name) => {
-  db.collection('users')
-    .add( {
-      id: id,
-      userName: name,
-      imgUrl: '',
-      wallet: 10,
-      lists: []
-    })
-    .then(user => user.id)
-    .catch(error => console.error("Error adding document: ", error))
-}
+function saveCurrentUserId(user) {
+  localStorage.setItem('currentUser', JSON.stringify(user.uid));
+};
+
+function getCurrentUserId() {
+  return JSON.parse(localStorage.getItem('currentUser'));
+};
 
 
 //-------------------funciones auxiliares-------------------------
@@ -227,6 +204,6 @@ function formValidation(email, password) {
 
 //Events
 document.querySelector('#signIn').addEventListener('click', userSignIn);
-// document.querySelector('#logOut').addEventListener('click', userSignOut);
-document.querySelector('#googleBtn').addEventListener('click', signInWithGoogle);
+document.querySelector('#logOut').addEventListener('click', userSignOut);
+document.querySelector('#googleLabelBtn').addEventListener('click', signInWithGoogle);
 document.querySelector('#signUp').addEventListener('click', dataToSignUp);
