@@ -1,13 +1,6 @@
 //firebase configuración
 //-----> FIREBASE_CONFIGURATION HERE
-const firebaseConfig = {
-  apiKey: "AIzaSyDtBWEVL3Wx5TgeZO71wRxwRrwzmwOn614",
-  authDomain: "giftme-9137e.firebaseapp.com",
-  projectId: "giftme-9137e",
-  storageBucket: "giftme-9137e.appspot.com",
-  messagingSenderId: "566433645364",
-  appId: "1:566433645364:web:de644895b8732101f91b61"
-};
+
 
 // //Inicialización de Firebase y variables
 firebase.initializeApp(firebaseConfig);
