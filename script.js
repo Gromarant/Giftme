@@ -15,6 +15,8 @@ const wishListSections = {
     id: 'search',
   }
 };
+let currentUserId;
+let currentDocId;
 
 const setVisibleSection = (targetSectionId) => {
   const sections = document.querySelectorAll('.section');
@@ -27,11 +29,12 @@ const setVisibleSection = (targetSectionId) => {
     }
   })
 }
-// setVisibleSection('form_registration') debe estar este
+setVisibleSection('form_registration')
 
 const showInitialPage = () => {
   document.querySelector('#logOut').classList.add('hidden');
   document.querySelector('.createListBtn').classList.add('hidden');
+  document.querySelector('.myListSearchBtn').classList.add('hidden');
   document.querySelector('.goToListsBtn').classList.add('hidden');
   setVisibleSection('form_registration')
 }
@@ -39,6 +42,7 @@ showInitialPage();
 
 //firebase configuración
 //-----> FIREBASE_CONFIGURATION HERE
+
 
 
 // //Inicialización de Firebase y variables
@@ -58,14 +62,12 @@ const userSignUp = async (email, password) => {
     .then(userCredential => {
       let user = userCredential.user;
       console.log(`se ha registrado ${user.email} ID:${user.uid}`)
-      createUserDocument(user.email);
-      createDocRef(user.uid);
-      curretUserId = user.uid;
+      createUserDocument(user.email, user.uid);
     })
     .catch((error) => {
       let errorCode = error.code;
       let errorMessage = error.message;
-      console.log(errorCode, errorMessage);
+      console.error(errorCode, errorMessage);
     });
     userEmail.value = '';
     userPassword.value = '';
@@ -88,20 +90,25 @@ const userSignIn = async () => {
 };
 
 //Registro/acceso con Google
-const signInWithGoogle = () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-
-  firebase.auth().signInWithRedirect(provider);
-  firebase.auth()
-  .getRedirectResult()
+const createUserDocumentWithGoogle = () => {
+  firebase.auth().getRedirectResult()
   .then(result => {
+
     if (result.credential) {
       /** @type {firebase.auth.OAuthCredential} */
       const credential = result.credential;
       const token = credential.accessToken;
       const user = result.user;
+      createUserDocument(user.displayName, user.uid, user.photoURL);
     }
   })
+}
+
+const signInWithGoogle = () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  firebase.auth().signInWithRedirect(provider)
+  .then(result => result)
   .catch(error => {
     let errorCode = error.code;
     let errorMessage = error.message;
@@ -128,27 +135,12 @@ const userSignOut = async () => {
   });
 };
 
-//Estado de usuario, escucha activo
-firebase
-  .auth()
-  .onAuthStateChanged(function (user) {
-  if (user) {
-    console.log('Existe el usuario');
-    console.log(user.email);
-    curretUserId = user.uid;
-    
-  } 
-  else {
-    console.log('No hay usuario activo');
-  }
-});
 
 // -------------------C.R.U.D
 const usersRef = db.collection('users');
 
 // obtener id de un registro/user
 function getDocId(userId) {
-
   usersRef.where('id', '==', userId)
     .get()
     .then( querySnapshot => {
@@ -156,22 +148,39 @@ function getDocId(userId) {
   });
 };
 
+
+
 // //-------------------CREATE
-function createUserDocument(email) {
-  
-  db.collection('users')
-    .doc()
-    .add( {
-      userName: name,
-      imgUrl: '',
-      wallet: 10,
-      lists: []
-    })
-    .then(user => userId = user.id)
-    .catch(error => console.error("Error creando el documento del usuario: ", error))
+function createUserDocument(email, id, image='') {
+  try {
+
+    db.collection('users')
+      .add( {
+        id,
+        userName: email,
+        imgUrl: image,
+        wallet: 10,
+        lists: []
+      })
+  }
+  catch(error) {
+    console.error("Error creando el documento del usuario: ", error)
+  }
 };
-// createUserDocument('lotopisflor_2@hotmail.com')
-// updateUser('FOR5QDG8FqLU71BG55Ou', { wallet: 50 })
+
+function setNewList() {
+  db.collection('users').where("userId", "==", currentUserId)
+  .get()
+  .then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+        console.log(doc.id, " => ", doc.data());
+    });
+  })
+  .catch((error) => {
+      console.error("Error getting documents: ", error);
+  });
+};
+
 
 function createList(name, items=[]) {
   return {
@@ -181,7 +190,7 @@ function createList(name, items=[]) {
 }
 
 function createItem(itemProp) {
-  let {itemName, id, imageUrl, price, description, type, address} = itemProp;
+  let {itemName, id, imageUrl, price, description, type, quantity} = itemProp;
 
   return {
     itemName,
@@ -196,18 +205,34 @@ function createItem(itemProp) {
 
 // //-------------------READ
 //lee una propiedad particular
-async function getCurrentDataUser(idUser, listName) {
+async function getEspecificDataUser(idUser, paramName, param) {
 
   await usersRef.where("userId", "==", idUser)
-    .where("listName", "==", listName)
+    .where(paramName, "==", param)
     .get()
     .then(querySnapshot => {
       querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data().listName);
+        console.log(doc.id, " => ", doc.data().paramName);
       })
     })
 }; 
 
+async function getUserData() {
+
+  await usersRef
+    .doc(currentDocId)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        return doc.data();
+      }
+    }).catch((error) => {
+      console.error("Error getting document:", error);
+    });
+}; 
+
+
+  
 // //--------------------Update
 //Actualiza datos de un usuario
 async function updateUserProps(docId, newData) {
@@ -221,22 +246,17 @@ async function updateUserProps(docId, newData) {
       console.error("Error al editar: ", error);
   };
 }
-// updateUserProps('FOR5QDG8FqLU71BG55Ou', { userName: "Marian" })
-// updateUserProps('FOR5QDG8FqLU71BG55Ou', { userName: 2500 })
-// updateUser('FOR5QDG8FqLU71BG55Ou', createList('Quiero')) ---> crea una lista
 
 async function updateList(docId, dataObj) {
   try {
     let user = await usersRef.doc(docId);
-  
-    await user.update(dataObj)
-    console.log("Se ha modificado con éxito");
+    await user.lists.update(dataObj)
+    alert("Se ha modificado con éxito");
   }
   catch(error) {
-      console.error("Error al editar: ", error);
+    console.error("Error al editar: ", error);
   };
 };
-// updateList('jq7t6tvho3ZjtupwEyga', { listName: 'Lo deseo'})
 
 // //-------------------DELETE
 async function DeleteUser(docId) {
@@ -263,19 +283,14 @@ async function DeleteList(docId, propName) {
 }
 
 // //-------------------User state
-
-function saveCurrentUserId(user) {
-  localStorage.setItem('currentUser', JSON.stringify(user.uid));
-};
-
-function getCurrentUserId() {
-  return JSON.parse(localStorage.getItem('currentUser'));
-};
-
-firebase.auth().onAuthStateChanged((user) => {
+firebase.auth().onAuthStateChanged( user => {
   if (user) {
     showListPage();
-    saveCurrentUserId(user)
+    currentUserId = user.uid;
+    currentDocId = getDocId(currentUserId);
+  }
+  else {
+    console.error('No hay usuario activo');
   }
 });
 
@@ -350,7 +365,7 @@ function renderLists(myLists) {
   const listAccessbtns = myLists.map(list => createListAccessBtn(list))
   document.querySelector('.listsColection').innerHTML = listAccessbtns.join('\n');
 }
-// renderLists([{listName: 'Ropa de Verano'}])
+renderLists([{listName: 'Ropa de Verano'}])
 
 
 function createCard(item) {
@@ -397,10 +412,39 @@ function showListPage() {
 
 function myListPage() {
   document.querySelector('.createListBtn').classList.add('hidden');
-  document.querySelector('.myListSearchBtn').classList.add('hidden');
+  document.querySelector('.myListSearchBtn').classList.remove('hidden');
   document.querySelector('.goToListsBtn').classList.remove('hidden');
   setVisibleSection('myList');
 }
+
+function searchPage() {
+  document.querySelector('.createListBtn').classList.add('hidden');
+  document.querySelector('.myListSearchBtn').classList.remove('hidden');
+  document.querySelector('.goToListsBtn').classList.remove('hidden');
+  setVisibleSection('search');
+}
+
+const handleChangelistName = async(e) => {
+  e.preventDefault();
+  try {
+    const inputListName = document.querySelector('.input__newName');
+    if (inputListName.value) {
+      await getUserData().then(data => {
+        
+        let newList = createList(data, items=[]);
+        myLists.push(newList);
+        
+        myLists.forEach(list => updateList(currentDocId, list))
+        document.querySelector('.myList__title').innerHTML = data;
+        inputListName.value = '';
+      });
+    };
+  }
+  catch(error) {
+    console.log(error);
+  };
+};
+
 
 //events
 document.querySelector('#logOut').addEventListener('click', () => {
@@ -410,34 +454,26 @@ document.querySelector('#logOut').addEventListener('click', () => {
   setVisibleSection('form_registration');
 });
 document.querySelector('.createListBtn').addEventListener('click', showListPage);
+
 document.querySelector('.goToListsBtn').addEventListener('click', showListPage);
+
 document.querySelector('.list__name').addEventListener('click', () => {
-  const userId = getCurrentUserId();
   document.querySelector('.myList__title').innerHTML = '';
   let currentList = document.querySelector('.list__name');
-  getCurrentDataUser(userId, ''); //modificación de la lista
+  updateList( currentDocId, { listName: currentList.textContent});
   document.querySelector('#form__newListName').classList.add('hidden');
   document.querySelector('.myList__title').innerHTML = currentList.textContent;
   myListPage();
 });
+
+document.querySelector('.myListSearchBtn').addEventListener('click', searchPage);
+
 document.querySelector('.createListBtn').addEventListener('click', () => {
-  const userId = getCurrentUserId();
   document.querySelector('.myList__title').innerHTML = 'Nueva Lista';
-  //Update lista
   myListPage();
 });
-document.querySelector('.input__newName').addEventListener('input', (e) => {
-  e.preventDefault();
-  if (e.target.value) {
-    const userId = getCurrentUserId();
-    getCurrentDataUser(userId, '');
-    const docId = getDocId(userId)
 
-    updateUserProps(docId, { listName: e.target.value})
-    document.querySelector('.myList__title').innerHTML = 'Nueva Lista';
-    myListPage();
-  }
-});
+document.querySelector('#form__newListName').addEventListener('submit', handleChangelistName);
 document.querySelector('#signIn').addEventListener('click', userSignIn);
 document.querySelector('#logOut').addEventListener('click', userSignOut);
 document.querySelector('#googleBtn').addEventListener('click', signInWithGoogle);
