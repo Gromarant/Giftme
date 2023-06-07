@@ -11,6 +11,8 @@ const getfakestoreData = async(category) => {
     console.error(error);
   }
 }
+// getfakestoreData('electronics')
+showInitialPage();
 
 const wishListSections = {
   form_registration: {
@@ -27,7 +29,18 @@ const wishListSections = {
   }
 };
 
-// getfakestoreData('electronics')
+function createListAccessBtn(list) {
+  return `<article class="List__Card wrapper">
+            <div>${list.listName}<div>
+          </article>`
+}
+
+function renderLists(myLists) {
+  const listAccessbtns = myLists.map(list => createListAccessBtn(list))
+  document.querySelector('.listsColection').innerHTML = listAccessbtns.join('\n');
+}
+renderLists([{listName: 'mi lista'}])
+
 
 function createCard(item) {
   return ` <article class="Product__Card wrapper">
@@ -58,13 +71,11 @@ const setEventListeners = (containerId) => {
   })
 }
   
-
 const renderAvailableProducts = () => {} //leerá de variable availableProductList 
 
 const setAvailableProductsList = (products) => {
   availableProductList = products;
 }
-
 
 function setVisibleSection(targetSectionId) {
   const sections = document.querySelectorAll('.section');
@@ -77,36 +88,39 @@ function setVisibleSection(targetSectionId) {
     }
   })
 }
-setVisibleSection('form_registration')
-//Events
-document.querySelector('#electronicsBtn').addEventListener('click', () => {
-  getfakestoreData('electronics').then(products => setAvailableProductsList(products))
-});
-document.querySelector('#jeweleryBtn').addEventListener('click', () => {
-  getfakestoreData('jewelery').then(products => setAvailableProductsList(products))
-});
-document.querySelector('#mensClothingBtn').addEventListener('click', () => {
-  getfakestoreData("men's clothing").then(products => setAvailableProductsList(products))
-});
-document.querySelector('#womensClothingBtn').addEventListener('click', () => {
-  getfakestoreData("women's clothing").then(products => setAvailableProductsList(products))
-});
-document.querySelector('#eventsBtn').addEventListener('click', () => {
-  getfakestoreData("women's clothing").then(products => setAvailableProductsList(products))
-});
+// setVisibleSection('form_registration') debe estar este
+function showInitialPage() {
+  document.querySelector('#logOut').classList.add('hidden');
+  document.querySelector('.createListBtn').classList.add('hidden');
+  setVisibleSection('form_registration')
+}
 
-document.querySelector('').addEventListener('click', () => {
+function showListPage() {
+  document.querySelector('#banner').classList.add('hidden');
+  document.querySelector('#signUp').classList.add('hidden');
+  document.querySelector('#signIn').classList.add('hidden');
+  document.querySelector('.createListBtn').classList.remove('hidden');
+  document.querySelector('#logOut').classList.remove('hidden');
+  setVisibleSection('lists')
+}
+
+//events
+document.querySelector('#logOut').addEventListener('click', () => {
+  userSignOut();
+  document.querySelector('#logOut').classList.add('hidden');
+  document.querySelector('.createListBtn').classList.add('hidden');
   setVisibleSection('form_registration');
 });
-
-document.querySelector('.tryAgainBtn').addEventListener('click', () => {
+document.querySelector('.createListBtn').addEventListener('click', () => {
+  document.querySelector('#banner').classList.add('hidden');
+  document.querySelector('#signIn').classList.add('hidden');
+  document.querySelector('#signUp').classList.add('hidden');
   setVisibleSection('lists');
 });
-
-document.querySelector('.homeBtn').addEventListener('click', () => {
-  setVisibleSection('myList');
-});
-document.querySelector('search').addEventListener('click', () => {
-  document.querySelector('.arrow_up').classList.add('hidden');
-  setVisibleSection(targetSectionId);
-});   
+// document.querySelector('.').addEventListener('click', () => {
+//   setVisibleSection('myList');
+// });
+// document.querySelector('').addEventListener('click', () => {
+//   document.querySelector('.arrow_up').classList.add('hidden');
+//   setVisibleSection(targetSectionId);
+// });

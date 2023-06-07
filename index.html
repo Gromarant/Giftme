@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="/assets/images/favicon-2023.png" type="image/x-icon">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Giftme</title>
 
@@ -17,10 +17,10 @@
 
 <body>
   <header>
-    <img src="https://colorlib.com/etc/regform/colorlib-regform-20/images/registration-form-4.jpg" alt="">
+    <img id="banner" src="https://colorlib.com/etc/regform/colorlib-regform-20/images/registration-form-4.jpg" alt="banner de inicio de la página">
   </header>
   <main>
-    <section id="form_registration">
+    <section id="form_registration" class="section">
       <form id="registration">
         <h2 class="signUp">Acceso</h2>
         <label class="input__container" id="googleBtn" for="googleBtn">
@@ -39,95 +39,36 @@
       </form>
       <p class="error_message"></p>
     </section>
-    <!-- <section class="container">
-      <h1 class="main-title">Our Products</h1>
-      <p class="min-content">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores corporis ipsa tempora,
-        blanditiis nam
-        perferendis deleniti iure error velit alias omnis facere, illum numquam molestiae eveniet nisi in molestias
-        laborum rerum! Omnis assumenda sunt excepturi facere. At rem maiores accusamus.</p>
-      <section class="product-grid">
 
-        <article class="card stacked featured">
-          <img src="assets/images/product.png" alt="a grey baseball hat with a small palm tree on the front" class="card__img">
-          <section class="card__content">
-            <h2 class="card__title">Lorem, ipsum dolor.</h2>
-            <p class="card__price">$325</p>
-            <p class="card__description">Lorem, ipsum dolor.</p>
-          </section>
-        </article>
+    <section id="lists" class="container section"> 
+      <h1>Mis listas</h1>
+      <section class="listsColection"></section>
+    </section>
 
-        <article class="card stacked">
-          <img src="assets/images/product.png" alt="" class="card__img">
-          <section class="card__content">
-            <h2 class="card__title">Minima, earum ipsam.</h2>
-            <p class="card__price">$500</p>
-            <p class="card__description">Illo, dolorem magnam?</p>
-          </section>
-        </article>
+    <section id="myList" class="container section"> 
+      <section class="product__grid lists"></section>
+    </section>
 
-        <article class="card stacked">
-          <img src="assets/images/product.png" alt="" class="card__img">
-          <section class="card__content">
-            <h2 class="card__title">Minima, earum ipsam.</h2>
-            <p class="card__price">$500</p>
-            <p class="card__description">Illo, dolorem magnam?</p>
-          </section>
-        </article>
-
-        <article class="card stacked">
-          <img src="assets/images/product.png" alt="" class="card__img">
-          <section class="card__content">
-            <h2 class="card__title">Minima, earum ipsam.</h2>
-            <p class="card__price">$500</p>
-            <p class="card__description">Illo, dolorem magnam?</p>
-          </section>
-        </article>
-
-        </article>
-        <article class="card stacked">
-          <img src="assets/images/product.png" alt="" class="card__img">
-          <section class="card__content">
-            <h2 class="card__title">Minima, earum ipsam.</h2>
-            <p class="card__price">$500</p>
-            <p class="card__description">Illo, dolorem magnam?</p>
-          </section>
-        </article>
-
-        <article class="card stacked">
-          <img src="assets/images/product.png" alt="" class="card__img">
-          <section class="card__content">
-            <h2 class="card__title">Minima, earum ipsam.</h2>
-            <p class="card__price">$500</p>
-            <p class="card__description">Illo, dolorem magnam?</p>
-          </section>
-        </article>
-
-        <article class="card stacked">
-          <img src="assets/images/product.png" alt="" class="card__img">
-          <section class="card__content">
-            <h2 class="card__title">Minima, earum ipsam.</h2>
-            <p class="card__price">$500</p>
-            <p class="card__description">Illo, dolorem magnam?</p>
-          </section>
-        </article>
-
-        <article class="card stacked">
-          <img src="assets/images/product.png" alt="" class="card__img">
-          <section class="card__content">
-            <h2 class="card__title">Minima, earum ipsam.</h2>
-            <p class="card__price">$500</p>
-            <p class="card__description">Illo, dolorem magnam?</p>
-          </section>
-        </article>
-
-      </section>
-
-    </section> -->
+  <section id="search" class="searchBar__container section">
+      <form id="searchBar__form">
+        <input type="search" id="searchBar" name="searchBar">
+        <button id="searchBtn">Buscar</button>
+    </form>
+    
+    <div class="category__buttons">
+      <button class="categoryBtn" id="electronicsBtn">Electronics</button>
+      <button class="categoryBtn" id="jeweleryBtn">Jewelery</button>
+      <button class="categoryBtn" id="mensClothingBtn">Men's clothing</button>
+      <button class="categoryBtn" id="womensClothingBtn">Women's clothing</button>
+    </div>
+  </section>
 
   </main>
   <footer>
     <button id="signUp" class="btn fillBtn">registrarte</button>
     <button id="signIn" class="btn outlineBtn">Iniciar sesión</button>
+    <button class="btn createListBtn">Crear lista</button>
+    <button id="logOut" class="btn outlineBtn">cerrar sesión</button>
   </footer>
   <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-firestore.js"></script>
