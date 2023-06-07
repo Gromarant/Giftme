@@ -57,7 +57,11 @@ footer {
 .product__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  background-color: #bbafaf;
+  padding: 1rem;
+}
+.myList__title,
+.list__title {
+  background-color: #e49144dc;
   padding: 1rem;
 }
 .wrapper {
@@ -113,7 +117,6 @@ footer {
 max-height: 20rem;
 }
 .product__text h2 {
-  /* margin: 0 0 47px 38px; */
   font-size: 13px;
   font-family: 'Raleway', sans-serif;
   font-weight: 400;
@@ -123,13 +126,21 @@ max-height: 20rem;
 }
 .product__text > p {
   height: 125px;
-  /* margin: 0 0 0 38px; */
   font-family: 'Playfair Display', serif;
   color: #8d8d8d;
   line-height: 1.7em;
   font-size: 1rem;
   font-weight: lighter;
   overflow: scroll;
+}
+.input__newName {
+  padding: 1rem 2rem;
+  border-radius: 2rem;
+  border: 0.1rem solid #C951C5;
+  background-color: #ffffff;
+  min-width: 12rem;
+  width: 70%;
+  margin: auto;
 }
 .product__price {
   display: flex;
@@ -173,10 +184,15 @@ max-height: 20rem;
 .btn {
   padding: 3rem 0.6rem;
 }
-.createListBtn {
+.createListBtn,
+.goToListsBtn {
   background-color: #2CA39F;
   color: #ffffff;
   border: none;
+}
+.myListSearchBtn {
+  color: #ffffff;
+  background-color: #a643a2;
 }
 .input__container {
   display: flex;
@@ -244,6 +260,7 @@ max-height: 20rem;
   background-color: transparent;
   margin-top: 0.5rem;
 }
+.setNamebtn,
 .categoryBtn {
   color: #C951C5;
   background-color: transparent;
@@ -297,6 +314,16 @@ max-height: 20rem;
 #logout {
   background-color: #bbafaf;
 }
-#lists {
+#lists,
+#myList {
   margin-top: 3rem;
+}
+#form__newListName {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  border-color: #ffffff;
+  padding-top: 1rem;
+  width: 90%;
+  margin: auto;
 }

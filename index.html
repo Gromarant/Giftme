@@ -41,11 +41,17 @@
     </section>
 
     <section id="lists" class="container section"> 
-      <h1>Mis listas</h1>
+      <h1 class="list__title">Mis listas</h1>
       <section class="listsColection"></section>
     </section>
 
     <section id="myList" class="container section"> 
+      <h1>Lista: </h1>
+      <h2 class="myList__title"></h2>
+      <form id="form__newListName">
+        <input class="input__newName" type="text" id="newListName" name="listName" placeholder="Nombre de lista" minlength="4" maxlength="20" size="10">
+        <button class="setNamebtn">Guardar</button>
+      </form>
       <section class="product__grid lists"></section>
     </section>
 
@@ -68,13 +74,14 @@
     <button id="signUp" class="btn fillBtn">registrarte</button>
     <button id="signIn" class="btn outlineBtn">Iniciar sesión</button>
     <button class="btn createListBtn">Crear lista</button>
+    <button class="btn goToListsBtn">volver a mis listas</button>
+    <button id="myListSearchBtn" class="btn myListSearchBtn">buscar productos</button>
     <button id="logOut" class="btn outlineBtn">cerrar sesión</button>
   </footer>
   <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-auth.js"></script>
   <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
-  <script src="firebase.js"></script>
   <script src="script.js"></script>
 </body>
 
