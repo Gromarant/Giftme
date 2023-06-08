@@ -1,5 +1,71 @@
 let availableProductList = [];
-let myLists = [{listName: 'Ropa de Verano'}, {listName: 'Ropa de invierno'}, {listName: 'Ropa de entretiempo'}, {listName: 'Ropa de baño'}];
+let myLists = [
+  {
+    listName: 'Ropa de Verano',
+    items: [
+      {
+        title: 'Pinguïno',
+        price: 15,
+        description: 'Un pingüinote',
+        id: 87,
+        image: '',
+        quantity: 2,
+        category: 'Animalotes'
+      },
+      {
+        title: 'Jirafota',
+        price: 15,
+        description: 'Un jirafota',
+        id: 87,
+        image: '',
+        quantity: 2,
+        category: 'Animalotes'
+      }
+    ]
+  },
+  {
+    listName: 'Ropa de invierno',
+    items: [
+      {
+        title: 'Pinguïno',
+        price: 15,
+        description: 'Un pingüinote',
+        id: 87,
+        image: '',
+        quantity: 2,
+        category: 'Animalotes'
+      }
+    ]
+  },
+  {
+    listName: 'Ropa de entretiempo',
+    items: [
+      {
+        title: 'Pinguïno',
+        price: 15,
+        description: 'Un pingüinote',
+        id: 87,
+        image: '',
+        quantity: 2,
+        category: 'Animalotes'
+      }
+    ]
+  },
+  {
+    listName: 'Ropa de baño',
+    items: [
+      {
+        title: 'Pinguïno',
+        price: 15,
+        description: 'Un pingüinote',
+        id: 87,
+        image: '',
+        quantity: 2,
+        category: 'Animalotes'
+      }
+    ]
+  }
+];
 let currentList = {};
 const wishListSections = {
   form_registration: {
@@ -158,7 +224,7 @@ function createListAccessBtn(list) {
   const listBntCard = document.createElement('article');
   listBntCard.className = 'List__Card wrapper';
   listBntCard.addEventListener('click', () => {
-    setCurrentList(list.listName);
+    setCurrentList(list);
     setMyListPage();
   });
 
@@ -173,8 +239,6 @@ function renderLists(myLists) {
   const listAccessbtns = myLists.map(list => createListAccessBtn(list));
   listAccessbtns.forEach(listElement => listCollection.appendChild(listElement));
 }
-// renderLists([{listName: 'Ropa de Verano'}, {listName: 'Ropa de Verano'}, {listName: 'Ropa de Verano'}, {listName: 'Ropa de Verano'}])
-
 
 //Create cards
 function createCard(item) {
@@ -215,7 +279,7 @@ function createCard(item) {
   spanMenus.className = 'iconify sustract';
   spanMenus.setAttribute('data-icon', 'iconamoon:sign-minus-circle');
   
-  spanMenus.addEventListener('click', console.log('quitar uno'))
+  spanMenus.addEventListener('click', () => console.log('quitar uno'))
 
   const quantityP = document.createElement('p');
   quantityP.className = 'quantity';
@@ -225,7 +289,7 @@ function createCard(item) {
   spanAdd.className = 'iconify addBtn';
   spanAdd.setAttribute('data-icon', 'flat-color-icons:plus');
 
-  spanAdd.addEventListener('click', console.log('sumar uno'))
+  spanAdd.addEventListener('click', () => console.log('sumar uno'))
   
   
   divProduct.appendChild(titleProduct);
@@ -255,17 +319,24 @@ const setAvailableProductsList = (products) => {
   availableProductList = products;
 }
 
-function setCurrentList(listName) {
-  currentList = listName;
+function setCurrentList(list) {
+  currentList = list;
+}
+
+function getCards(items) {
+  return items.map(item => createCard(item));
+}
+
+function renderListItems(list) {
+  const itemsContainer = document.querySelector('#myListItems');
+  itemsContainer.innerHTML = '';
+  getCards(list.items).forEach(card => itemsContainer.appendChild(card));
 }
 
 const renderAvailableProducts = (availableProducts) => {
   const availableContainer = document.querySelector('#available__container');
   availableContainer.innerHTML = '';
-  availableProductList.map((item) => {
-    let card = createCard(item)
-    availableContainer.appendChild(card);
-  })
+  getCards(availableProducts).forEach(card => availableContainer.appendChild(card));
 };
 
 async function updateMyLists() {
@@ -283,16 +354,6 @@ function saveNewList(list) {
   myLists.push(list);
 }
 
-//events
-// document.querySelector('.list__name').addEventListener('click', () => {
-  
-  //   let currentList = document.querySelector('.list__name');
-  //   updateArrays({ listName: currentList.textContent});
-  //   document.querySelector('#form__newListName').classList.add('hidden');
-  //   document.querySelector('.myList__title').innerHTML = currentList.textContent ?? 'Nueva lista';
-  //   myListPage();
-  // });
-
 function setVisibleSection(targetSectionId) {
   const sections = document.querySelectorAll('.section');
 
@@ -306,34 +367,30 @@ function setVisibleSection(targetSectionId) {
 }
 
 function showInitialPage() {
-  console.log('showInitialPage');
   hideElements(['#logOut', '.createListBtn', '.myListSearchBtn', '.goToListsBtn', '#lists', '#newList', '#myList', '#search'])
   displayElements(['#form_registration']);
 }
 
 function setNewListPage() {
-  console.log('setNewListPage');
   document.querySelector('#newListName').value = '';
   hideElements(['#banner', '#signUp','#signIn', '#myList', '.myListSearchBtn', '#lists', '.createListBtn'])
   displayElements(['#newList', '#logOut'])
 }
 
 function setMyListPage() {
-  console.log('setMyListPage');
-  document.querySelector('#myList__title').innerHTML = 'Lista: ' + currentList;
+  document.querySelector('#myList__title').innerHTML = 'Lista: ' + currentList.listName;
+  renderListItems(currentList);
   hideElements(['#banner', '#signUp','#signIn', '.myListSearchBtn', '#newList', '.createListBtn', '#lists'])
   displayElements(['#myList', '#logOut'])
 }
 
 function setMyListsPage() {
-  console.log('setMyListsPage');
   hideElements(['#banner', '#form_registration', '#signUp', '#signIn', '#myList', '#newList'])
   displayElements(['#lists', '#logOut', '.createListBtn'])
   renderLists(myLists)
 }
 
 function setSearchPage() {
-  console.log('searchPage');
   hideElements(['.createListBtn', '#myList', '#newList'])
   displayElements(['#search','.myListSearchBtn', '#logOut', '.goToListsBtn'])
 }
