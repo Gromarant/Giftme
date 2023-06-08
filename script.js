@@ -1,5 +1,5 @@
 let availableProductList = [];
-let myLists = [];
+let myLists = [{listName: 'Ropa de Verano'}, {listName: 'Ropa de invierno'}, {listName: 'Ropa de entretiempo'}, {listName: 'Ropa de baño'}];
 let currentList = {};
 const wishListSections = {
   form_registration: {
@@ -16,10 +16,6 @@ const wishListSections = {
   }
 };
 let currentUserId;
-
-
-
-showInitialPage();
 
 //firebase configuración
 //-----> FIREBASE_CONFIGURATION HERE
@@ -88,9 +84,8 @@ const userSignOut = async () => {
 // //-------------------User state
 firebase.auth().onAuthStateChanged( user => {
   if (user) {
-    showListPage();
+    setMyListsPage();
     currentUserId = user.uid;
-    currentDocId = getDocId(user.uid);
   }
   else {
     console.error('No hay usuario activo');
@@ -162,6 +157,10 @@ function createListAccessBtn(list) {
 
   const listBntCard = document.createElement('article');
   listBntCard.className = 'List__Card wrapper';
+  listBntCard.addEventListener('click', () => {
+    setCurrentList(list.listName);
+    setMyListPage();
+  });
 
   listBntCard.appendChild(listName);
 
@@ -170,6 +169,7 @@ function createListAccessBtn(list) {
 
 function renderLists(myLists) {
   const listCollection = document.querySelector('.listsColection');
+  listCollection.innerHTML = '';
   const listAccessbtns = myLists.map(list => createListAccessBtn(list));
   listAccessbtns.forEach(listElement => listCollection.appendChild(listElement));
 }
@@ -255,10 +255,16 @@ const setAvailableProductsList = (products) => {
   availableProductList = products;
 }
 
+function setCurrentList(listName) {
+  currentList = listName;
+}
+
 const renderAvailableProducts = (availableProducts) => {
-  availableProductList.map((item, i) => {
+  const availableContainer = document.querySelector('#available__container');
+  availableContainer.innerHTML = '';
+  availableProductList.map((item) => {
     let card = createCard(item)
-    document.querySelector('#available__container').appendChild(card);
+    availableContainer.appendChild(card);
   })
 };
 
@@ -273,55 +279,19 @@ async function updateMyLists() {
   }
 }
 
-function showListPage() {
-  document.querySelector('.list__title').innerHTML = 'Mis listas:';
-  document.querySelector('#banner').classList.add('hidden');
-  document.querySelector('#signUp').classList.add('hidden');
-  document.querySelector('#signIn').classList.add('hidden');
-  document.querySelector('.myListSearchBtn').classList.add('hidden');
-  document.querySelector('.goToListsBtn').classList.add('hidden');
-  document.querySelector('.createListBtn').classList.remove('hidden');
-  document.querySelector('#logOut').classList.remove('hidden');
-  renderLists(myLists);
-  setVisibleSection('lists')
+function saveNewList(list) {
+  myLists.push(list);
 }
 
-function myListPage() {
-  document.querySelector('.myListSearchBtn').classList.remove('hidden');
-  document.querySelector('.goToListsBtn').classList.remove('hidden');
-  renderLists(myLists)
-  setVisibleSection('myList');
-}
-
-function searchPage() {
-  document.querySelector('.createListBtn').classList.add('hidden');
-  document.querySelector('.myListSearchBtn').classList.remove('hidden');
-  document.querySelector('.goToListsBtn').classList.remove('hidden');
-  setVisibleSection('search');
-}
-
-const handleChangelistName = async(e) => {
-  e.preventDefault();
-  try {
-    let oldTitle = document.querySelector('.myList__title').textContent;
-    const inputListName = document.querySelector('.input__newName');
-    if (inputListName.value) {
-      let newList = createList(inputListName.value, items=[]);
-      if (myLists.indexOf(inputListName.value) === -1) {
-        updateArrays('lists', newList);
-        myLists.push(newList);
-        renderLists(myLists);
-      }
-      else {
-        myLists.replace(oldTitle, newList);
-      }
-      inputListName.value = '';
-    };
-  }
-  catch(error) {
-    console.error(error);
-  };
-};
+//events
+// document.querySelector('.list__name').addEventListener('click', () => {
+  
+  //   let currentList = document.querySelector('.list__name');
+  //   updateArrays({ listName: currentList.textContent});
+  //   document.querySelector('#form__newListName').classList.add('hidden');
+  //   document.querySelector('.myList__title').innerHTML = currentList.textContent ?? 'Nueva lista';
+  //   myListPage();
+  // });
 
 function setVisibleSection(targetSectionId) {
   const sections = document.querySelectorAll('.section');
@@ -334,100 +304,72 @@ function setVisibleSection(targetSectionId) {
     }
   })
 }
-setVisibleSection('form_registration')
 
 function showInitialPage() {
-  document.querySelector('#logOut').classList.add('hidden');
-  document.querySelector('.createListBtn').classList.add('hidden');
-  document.querySelector('.myListSearchBtn').classList.add('hidden');
-  document.querySelector('.goToListsBtn').classList.add('hidden');
-  setVisibleSection('form_registration')
+  console.log('showInitialPage');
+  hideElements(['#logOut', '.createListBtn', '.myListSearchBtn', '.goToListsBtn', '#lists', '#newList', '#myList', '#search'])
+  displayElements(['#form_registration']);
 }
 
-//events
+function setNewListPage() {
+  console.log('setNewListPage');
+  document.querySelector('#newListName').value = '';
+  hideElements(['#banner', '#signUp','#signIn', '#myList', '.myListSearchBtn', '#lists', '.createListBtn'])
+  displayElements(['#newList', '#logOut'])
+}
+
+function setMyListPage() {
+  console.log('setMyListPage');
+  document.querySelector('#myList__title').innerHTML = 'Lista: ' + currentList;
+  hideElements(['#banner', '#signUp','#signIn', '.myListSearchBtn', '#newList', '.createListBtn', '#lists'])
+  displayElements(['#myList', '#logOut'])
+}
+
+function setMyListsPage() {
+  console.log('setMyListsPage');
+  hideElements(['#banner', '#form_registration', '#signUp', '#signIn', '#myList', '#newList'])
+  displayElements(['#lists', '#logOut', '.createListBtn'])
+  renderLists(myLists)
+}
+
+function setSearchPage() {
+  console.log('searchPage');
+  hideElements(['.createListBtn', '#myList', '#newList'])
+  displayElements(['#search','.myListSearchBtn', '#logOut', '.goToListsBtn'])
+}
+
+function hideElements(selectors) {
+  selectors.forEach(selector => document.querySelector(selector).classList.add('hidden'));
+}
+function displayElements(selectors) {
+  selectors.forEach(selector => document.querySelector(selector).classList.remove('hidden'));
+}
+
 document.querySelector('#logOut').addEventListener('click', () => {
   userSignOut();
-  document.querySelector('#logOut').classList.add('hidden');
-  document.querySelector('.createListBtn').classList.add('hidden');
-  setVisibleSection('form_registration');
+  hideElements(['#logOut', '.createListBtn', '#lists', '#myList', '#newList'])
+  displayElements(['#banner', '#form_registration', '#signUp', '#signIn'])
 });
-
-document.querySelector('.createListBtn').addEventListener('click', () => {
-  let ListName = document.querySelector('.myList__title').textContent;
-  let newList = createList(ListName, items=[]);
-  let thereIsMoreWithThatName = myLists.some(list => list === newList);
-  if (!thereIsMoreWithThatName) {
-    myLists.push(newList);
-    renderLists(myLists);
-  }
-  showListPage();
-});
-
-document.querySelector('.goToListsBtn').addEventListener('click', showListPage);
-
-document.querySelector('.list__name').addEventListener('click', () => {
-
-  let currentList = document.querySelector('.list__name');
-  updateArrays({ listName: currentList.textContent});
-  document.querySelector('#form__newListName').classList.add('hidden');
-  document.querySelector('.myList__title').innerHTML = currentList.textContent ?? 'Nueva lista';
-  myListPage();
-});
-
-document.querySelector('.myListSearchBtn').addEventListener('click', searchPage);
-
-document.querySelector('.createListBtn').addEventListener('click', () => {
-  document.querySelector('.myList__title').innerHTML = 'Nueva Lista';
-  myListPage();
-});
-
-document.querySelector('#electronicsBtn').addEventListener('click', async() => {
-  try {
-    let data = await getfakestoreData('electronics')
-    setAvailableProductsList(data)
-    renderAvailableProducts(data);
-  }
-  catch(error) {
-    console.error(error);
-  }
-});
-
-document.querySelector('#jeweleryBtn').addEventListener('click', async() => {
-  try {
-    let data = await getfakestoreData('jewelery')
-    setAvailableProductsList(data)
-    renderAvailableProducts(data);
-  }
-  catch(error) {
-    console.error(error);
-  }
-});
-
-document.querySelector('#mensClothingBtn').addEventListener('click', async() => {
-  try {
-    let data = await getfakestoreData("men's clothing")
-    setAvailableProductsList(data)
-    renderAvailableProducts(data);
-  }
-  catch(error) {
-    console.error(error);
-  }
-});
-
-document.querySelector('#womensClothingBtn').addEventListener('click', async() => {
-  try {
-    let data = await getfakestoreData("women's clothing")
-    setAvailableProductsList(data)
-    renderAvailableProducts(data);
-  }
-  catch(error) {
-    console.error(error);
-  }
-});
-// document.querySelector('#jeweleryBtn').addEventListener('click', );
-// document.querySelector('#mensClothingBtn').addEventListener('click', );
-// document.querySelector('#womensClothingBtn').addEventListener('click', );
-document.querySelector('#form__newListName').addEventListener('submit', handleChangelistName);
+document.querySelector('.createListBtn').addEventListener('click', setNewListPage);
+document.querySelector('.goToListsBtn').addEventListener('click', setMyListPage);
+document.querySelector('.myListSearchBtn').addEventListener('click', setSearchPage);
+document.querySelector('#electronicsBtn').addEventListener('click', async() => displayProducts('electronics'))
+document.querySelector('#jeweleryBtn').addEventListener('click', async() => displayProducts('jewelery'));
+document.querySelector('#mensClothingBtn').addEventListener('click', async() => displayProducts("men's clothing"));
+document.querySelector('#womensClothingBtn').addEventListener('click', async() => displayProducts("women's clothing"));
 document.querySelector('#signIn').addEventListener('click', userSignIn);
 document.querySelector('#logOut').addEventListener('click', userSignOut);
 document.querySelector('#signUp').addEventListener('click', dataToSignUp);
+document.querySelectorAll('.backToMyLists').forEach(button => button.addEventListener('click', setMyListsPage));
+document.querySelector('#saveNewListButton').addEventListener('click', () => {
+  const newListName = document.querySelector('#newListName').value;
+  const newList = {
+    listName: newListName,
+    items: [],
+  };
+
+  saveNewList(newList);
+  setMyListsPage();
+});
+
+showInitialPage();

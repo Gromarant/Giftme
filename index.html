@@ -37,24 +37,29 @@
     </section>
 
     <section id="lists" class="container section"> 
-      <h1 class="list__title">Nueva Lista</h1>
+      <h1 class="list__title">Mis listas</h1>
       <section class="listsColection"></section>
     </section>
 
-    <section id="myList" class="container section"> 
-      <h1>Lista: </h1>
-      <h2 class="myList__title"></h2>
-      <form id="form__newListName">
+    <section id="newList" class="container section"> 
+      <h1>Nueva lista</h1>
+      <section id="form__newListName">
         <input class="input__newName" type="text" id="newListName" name="listName" placeholder="Nombre de lista" minlength="4" maxlength="20" size="10">
-        <button class="setNamebtn">Guardar</button>
-      </form>
+        <button id="saveNewListButton" class="saveButton">Guardar</button>
+        <button class="backToMyLists">Volver</button>
+      </section>
+    </section>
+
+    <section id="myList" class="container section"> 
+      <h1 id="myList__title" class="list__title"></h1>
       <section class="product__grid lists"></section>
+      <button class="backToMyLists">Volver</button>
     </section>
 
   <section id="search" class="searchBar__container section">
     <div class="category__buttons">
       <button class="categoryBtn" id="electronicsBtn">Electronics</button>
-      <button class="categoryBtn" id="jeweleryBtnreateList">Jewelery</button>
+      <button class="categoryBtn" id="jeweleryBtn">Jewelery</button>
       <button class="categoryBtn" id="mensClothingBtn">Men's clothing</button>
       <button class="categoryBtn" id="womensClothingBtn">Women's clothing</button>
     </div>

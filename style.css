@@ -59,7 +59,6 @@ footer {
   grid-template-columns: repeat(3, 1fr);
   padding: 1rem;
 }
-.myList__title,
 .list__title {
   background-color: #e49144dc;
   padding: 1rem;
@@ -262,7 +261,8 @@ max-height: 20rem;
   background-color: transparent;
   margin-top: 0.5rem;
 }
-.setNamebtn,
+.backToMyLists,
+.saveButton,
 .categoryBtn {
   color: #C951C5;
   background-color: transparent;
