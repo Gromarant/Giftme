@@ -23,10 +23,6 @@
     <section id="form_registration" class="section">
       <form id="registration">
         <h2 class="signUp">Acceso</h2>
-        <label class="input__container" id="googleBtn" for="googleBtn">
-          <span class="googleIcon iconify" data-icon="flat-color-icons:google"></span>
-          <input class="input" id="googleInput" type="button" name="googleBtn" value="Google">
-        </label>
         <span class="divider" data-icon="mdi:password">or</span>
         <label class="input__container" for="email">
           <span class="iconify gray" data-icon="material-symbols:mail"></span>
@@ -41,7 +37,7 @@
     </section>
 
     <section id="lists" class="container section"> 
-      <h1 class="list__title">Mis listas</h1>
+      <h1 class="list__title">Nueva Lista</h1>
       <section class="listsColection"></section>
     </section>
 
@@ -56,17 +52,13 @@
     </section>
 
   <section id="search" class="searchBar__container section">
-      <form id="searchBar__form">
-        <input type="search" id="searchBar" name="searchBar">
-        <button id="searchBtn">Buscar</button>
-    </form>
-    
     <div class="category__buttons">
       <button class="categoryBtn" id="electronicsBtn">Electronics</button>
-      <button class="categoryBtn" id="jeweleryBtn">Jewelery</button>
+      <button class="categoryBtn" id="jeweleryBtnreateList">Jewelery</button>
       <button class="categoryBtn" id="mensClothingBtn">Men's clothing</button>
       <button class="categoryBtn" id="womensClothingBtn">Women's clothing</button>
     </div>
+    <section id="available__container"></section>
   </section>
 
   </main>
@@ -74,8 +66,8 @@
     <button id="signUp" class="btn fillBtn">registrarte</button>
     <button id="signIn" class="btn outlineBtn">Iniciar sesión</button>
     <button class="btn createListBtn">Crear lista</button>
-    <button class="btn goToListsBtn">volver a mis listas</button>
     <button id="myListSearchBtn" class="btn myListSearchBtn">buscar productos</button>
+    <button class="btn goToListsBtn">volver a mis listas</button>
     <button id="logOut" class="btn outlineBtn">cerrar sesión</button>
   </footer>
   <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>

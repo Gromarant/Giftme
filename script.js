@@ -16,33 +16,13 @@ const wishListSections = {
   }
 };
 let currentUserId;
-let currentDocId;
 
-const setVisibleSection = (targetSectionId) => {
-  const sections = document.querySelectorAll('.section');
 
-  sections.forEach(section => {
-    if (section.id === targetSectionId) {
-      section.classList.remove('hidden');
-    } else {
-      section.classList.add('hidden');
-    }
-  })
-}
-setVisibleSection('form_registration')
 
-const showInitialPage = () => {
-  document.querySelector('#logOut').classList.add('hidden');
-  document.querySelector('.createListBtn').classList.add('hidden');
-  document.querySelector('.myListSearchBtn').classList.add('hidden');
-  document.querySelector('.goToListsBtn').classList.add('hidden');
-  setVisibleSection('form_registration')
-}
 showInitialPage();
 
 //firebase configuración
 //-----> FIREBASE_CONFIGURATION HERE
-
 
 
 // //Inicialización de Firebase y variables
@@ -53,7 +33,7 @@ const userEmail = document.querySelector('#email');
 const userPassword = document.querySelector('#password');
 let curretUserId;
 
-// //Registro de usuario 
+// //Registro de usuario
 const userSignUp = async (email, password) => {
   cleanErrorMessage();
 
@@ -89,36 +69,6 @@ const userSignIn = async () => {
     userPassword.value = '';
 };
 
-//Registro/acceso con Google
-const createUserDocumentWithGoogle = () => {
-  firebase.auth().getRedirectResult()
-  .then(result => {
-
-    if (result.credential) {
-      /** @type {firebase.auth.OAuthCredential} */
-      const credential = result.credential;
-      const token = credential.accessToken;
-      const user = result.user;
-      createUserDocument(user.displayName, user.uid, user.photoURL);
-    }
-  })
-}
-
-const signInWithGoogle = () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-
-  firebase.auth().signInWithRedirect(provider)
-  .then(result => result)
-  .catch(error => {
-    let errorCode = error.code;
-    let errorMessage = error.message;
-    let email = error.email;
-    let credential = error.credential;
-    console.log("Error al ingresar: ", errorCode, errorMessage);
-    console.log("Error usuario o contraseña: ", email, credential);
-  });
-}
-
 //Salida de la app
 const userSignOut = async () => {
   let user = await firebase.auth().currentUser;
@@ -135,159 +85,12 @@ const userSignOut = async () => {
   });
 };
 
-
-// -------------------C.R.U.D
-const usersRef = db.collection('users');
-
-// obtener id de un registro/user
-function getDocId(userId) {
-  usersRef.where('id', '==', userId)
-    .get()
-    .then( querySnapshot => {
-      querySnapshot.forEach((doc) => doc.id);
-  });
-};
-
-
-
-// //-------------------CREATE
-function createUserDocument(email, id, image='') {
-  try {
-
-    db.collection('users')
-      .add( {
-        id,
-        userName: email,
-        imgUrl: image,
-        wallet: 10,
-        lists: []
-      })
-  }
-  catch(error) {
-    console.error("Error creando el documento del usuario: ", error)
-  }
-};
-
-function setNewList() {
-  db.collection('users').where("userId", "==", currentUserId)
-  .get()
-  .then((querySnapshot) => {
-    querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
-    });
-  })
-  .catch((error) => {
-      console.error("Error getting documents: ", error);
-  });
-};
-
-
-function createList(name, items=[]) {
-  return {
-    listName: name,
-    items,
-  }
-}
-
-function createItem(itemProp) {
-  let {itemName, id, imageUrl, price, description, type, quantity} = itemProp;
-
-  return {
-    itemName,
-    id,
-    imageUrl,
-    price,
-    description,
-    type,
-    quantity,
-  }
-}
-
-// //-------------------READ
-//lee una propiedad particular
-async function getEspecificDataUser(idUser, paramName, param) {
-
-  await usersRef.where("userId", "==", idUser)
-    .where(paramName, "==", param)
-    .get()
-    .then(querySnapshot => {
-      querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data().paramName);
-      })
-    })
-}; 
-
-async function getUserData() {
-
-  await usersRef
-    .doc(currentDocId)
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        return doc.data();
-      }
-    }).catch((error) => {
-      console.error("Error getting document:", error);
-    });
-}; 
-
-
-  
-// //--------------------Update
-//Actualiza datos de un usuario
-async function updateUserProps(docId, newData) {
-  try {
-    let user = await usersRef.doc(docId);
-  
-    await user.update(newData)
-    console.log("Los datos se han modificado con éxito");
-  }
-  catch(error) {
-      console.error("Error al editar: ", error);
-  };
-}
-
-async function updateList(docId, dataObj) {
-  try {
-    let user = await usersRef.doc(docId);
-    await user.lists.update(dataObj)
-    alert("Se ha modificado con éxito");
-  }
-  catch(error) {
-    console.error("Error al editar: ", error);
-  };
-};
-
-// //-------------------DELETE
-async function DeleteUser(docId) {
-  try {
-    let user = await usersRef.doc(docId); 
-    await user.delete();
-    console.log(`Se ha borrado con éxito el usuario con id: ${docId}`);
-  } 
-  catch (error) {
-    console.error("Error al borrar:", error);
-  }
-}
-
-async function DeleteList(docId, propName) {
-  try {
-    await usersRef.doc(docId)
-      .update({
-      propName: firebase.firestore.FieldValue.delete()
-    })
-  }
-  catch(error) {
-    console.error("Error al borrar:", error);
-  }
-}
-
 // //-------------------User state
 firebase.auth().onAuthStateChanged( user => {
   if (user) {
     showListPage();
     currentUserId = user.uid;
-    currentDocId = getDocId(currentUserId);
+    currentDocId = getDocId(user.uid);
   }
   else {
     console.error('No hay usuario activo');
@@ -341,7 +144,6 @@ function formValidation(email, password) {
   return validated;
 }
 
-
 // //-------------------Request
 const getfakestoreData = async(category) => {
   try {
@@ -352,43 +154,100 @@ const getfakestoreData = async(category) => {
     console.error(error);
   }
 }
-// getfakestoreData('electronics')
-
 
 function createListAccessBtn(list) {
-  return `<article class="List__Card wrapper">
-            <p class="list__name">${list.listName}<p>
-          </article>`
+  const listName = document.createElement('p');
+  listName.className = 'list__name';
+  listName.innerHTML = list.listName
+
+  const listBntCard = document.createElement('article');
+  listBntCard.className = 'List__Card wrapper';
+
+  listBntCard.appendChild(listName);
+
+  return listBntCard;
 }
 
 function renderLists(myLists) {
-  const listAccessbtns = myLists.map(list => createListAccessBtn(list))
-  document.querySelector('.listsColection').innerHTML = listAccessbtns.join('\n');
+  const listCollection = document.querySelector('.listsColection');
+  const listAccessbtns = myLists.map(list => createListAccessBtn(list));
+  listAccessbtns.forEach(listElement => listCollection.appendChild(listElement));
 }
-renderLists([{listName: 'Ropa de Verano'}])
+// renderLists([{listName: 'Ropa de Verano'}, {listName: 'Ropa de Verano'}, {listName: 'Ropa de Verano'}, {listName: 'Ropa de Verano'}])
 
 
+//Create cards
 function createCard(item) {
-  return ` <article class="Product__Card wrapper">
-                <section class="product__img">
-                  <img src="${item.image}" alt="${item.title}">
-                </section>
-                <section class="product__info">
-                  <div class="product__text">
-                    <h1>${item.title}</h1>
-                    <h2>Category: ${item.category}</h2>
-                    <p>${item.description}</p>
-                  </div>
-                  <div class="product__price">
-                    <p><span>${item.price}</span>€</p>
-                    <div id="${item.id} class="amount__buttos">
-                      <span class="iconify sustract" data-icon="iconamoon:sign-minus-circle"></span>
-                      <p class="amount">${item.image}</p>
-                      <span class="iconify addBtn" data-icon="flat-color-icons:plus"></span>
-                    </div>
-                  </div>
-                </section>
-              </article>`
+  //seccion image
+  const sectionImg = document.createElement('section');
+  sectionImg.className = 'product__img';
+  const img = document.createElement('img');
+  img.src = item.image;
+  sectionImg.appendChild(img);
+
+  //product info
+  const sectionProductInfo = document.createElement('section');
+  sectionProductInfo.className = 'product__info';
+  
+  const divProduct = document.createElement('div');
+  divProduct.className = 'product__text';
+  const titleProduct = document.createElement('h1');
+  titleProduct.innerHTML = item.title;
+  const categoryProduct = document.createElement('h2');
+  categoryProduct.innerHTML = 'Category: ' + item.category;
+  const descripProduct = document.createElement('p');
+  descripProduct.innerHTML = item.description;
+  
+  // price
+  const divPrice = document.createElement('div');
+  divPrice.className = 'product__price';
+
+  const price = document.createElement('p');
+  price.innerHTML = item.price + ' €';
+  price.className = 'span__price';
+  
+  //quantity
+  const quantity = document.createElement('div');
+  quantity.className = 'quantity__buttons';
+
+  //quantity__Buttons
+  const spanMenus = document.createElement('span');
+  spanMenus.className = 'iconify sustract';
+  spanMenus.setAttribute('data-icon', 'iconamoon:sign-minus-circle');
+  
+  spanMenus.addEventListener('click', console.log('quitar uno'))
+
+  const quantityP = document.createElement('p');
+  quantityP.className = 'quantity';
+  quantityP.innerHTML = item.quantity;
+
+  const spanAdd = document.createElement('span');
+  spanAdd.className = 'iconify addBtn';
+  spanAdd.setAttribute('data-icon', 'flat-color-icons:plus');
+
+  spanAdd.addEventListener('click', console.log('sumar uno'))
+  
+  
+  divProduct.appendChild(titleProduct);
+  divProduct.appendChild(categoryProduct);
+  divProduct.appendChild(descripProduct);
+  sectionProductInfo.appendChild(divProduct);
+  sectionProductInfo.appendChild(divPrice);
+
+  divPrice.appendChild(price);
+  divPrice.appendChild(quantity);
+ 
+  quantity.appendChild(spanMenus);
+  quantity.appendChild(quantityP);
+  quantity.appendChild(spanAdd);
+
+  // Cardwrapper
+  const wrapper = document.createElement('article');
+  wrapper.className = 'Product__Card wrapper';
+  wrapper.appendChild(sectionImg);
+  wrapper.appendChild(sectionProductInfo);
+
+  return wrapper
 };
 
 //actualiza la variable con los productos filtrados
@@ -396,7 +255,23 @@ const setAvailableProductsList = (products) => {
   availableProductList = products;
 }
 
-// const renderAvailableProducts = () => {} //leerá de variable availableProductList 
+const renderAvailableProducts = (availableProducts) => {
+  availableProductList.map((item, i) => {
+    let card = createCard(item)
+    document.querySelector('#available__container').appendChild(card);
+  })
+};
+
+async function updateMyLists() {
+  try {
+
+    let data = await getUserData(currentDocId)
+    let lists = await data
+  }
+  catch(error) {
+    console.error("Error creando el documento del usuario: ", error)
+  }
+}
 
 function showListPage() {
   document.querySelector('.list__title').innerHTML = 'Mis listas:';
@@ -407,13 +282,14 @@ function showListPage() {
   document.querySelector('.goToListsBtn').classList.add('hidden');
   document.querySelector('.createListBtn').classList.remove('hidden');
   document.querySelector('#logOut').classList.remove('hidden');
+  renderLists(myLists);
   setVisibleSection('lists')
 }
 
 function myListPage() {
-  document.querySelector('.createListBtn').classList.add('hidden');
   document.querySelector('.myListSearchBtn').classList.remove('hidden');
   document.querySelector('.goToListsBtn').classList.remove('hidden');
+  renderLists(myLists)
   setVisibleSection('myList');
 }
 
@@ -427,24 +303,46 @@ function searchPage() {
 const handleChangelistName = async(e) => {
   e.preventDefault();
   try {
+    let oldTitle = document.querySelector('.myList__title').textContent;
     const inputListName = document.querySelector('.input__newName');
     if (inputListName.value) {
-      await getUserData().then(data => {
-        
-        let newList = createList(data, items=[]);
+      let newList = createList(inputListName.value, items=[]);
+      if (myLists.indexOf(inputListName.value) === -1) {
+        updateArrays('lists', newList);
         myLists.push(newList);
-        
-        myLists.forEach(list => updateList(currentDocId, list))
-        document.querySelector('.myList__title').innerHTML = data;
-        inputListName.value = '';
-      });
+        renderLists(myLists);
+      }
+      else {
+        myLists.replace(oldTitle, newList);
+      }
+      inputListName.value = '';
     };
   }
   catch(error) {
-    console.log(error);
+    console.error(error);
   };
 };
 
+function setVisibleSection(targetSectionId) {
+  const sections = document.querySelectorAll('.section');
+
+  sections.forEach(section => {
+    if (section.id === targetSectionId) {
+      section.classList.remove('hidden');
+    } else {
+      section.classList.add('hidden');
+    }
+  })
+}
+setVisibleSection('form_registration')
+
+function showInitialPage() {
+  document.querySelector('#logOut').classList.add('hidden');
+  document.querySelector('.createListBtn').classList.add('hidden');
+  document.querySelector('.myListSearchBtn').classList.add('hidden');
+  document.querySelector('.goToListsBtn').classList.add('hidden');
+  setVisibleSection('form_registration')
+}
 
 //events
 document.querySelector('#logOut').addEventListener('click', () => {
@@ -453,16 +351,26 @@ document.querySelector('#logOut').addEventListener('click', () => {
   document.querySelector('.createListBtn').classList.add('hidden');
   setVisibleSection('form_registration');
 });
-document.querySelector('.createListBtn').addEventListener('click', showListPage);
+
+document.querySelector('.createListBtn').addEventListener('click', () => {
+  let ListName = document.querySelector('.myList__title').textContent;
+  let newList = createList(ListName, items=[]);
+  let thereIsMoreWithThatName = myLists.some(list => list === newList);
+  if (!thereIsMoreWithThatName) {
+    myLists.push(newList);
+    renderLists(myLists);
+  }
+  showListPage();
+});
 
 document.querySelector('.goToListsBtn').addEventListener('click', showListPage);
 
 document.querySelector('.list__name').addEventListener('click', () => {
-  document.querySelector('.myList__title').innerHTML = '';
+
   let currentList = document.querySelector('.list__name');
-  updateList( currentDocId, { listName: currentList.textContent});
+  updateArrays({ listName: currentList.textContent});
   document.querySelector('#form__newListName').classList.add('hidden');
-  document.querySelector('.myList__title').innerHTML = currentList.textContent;
+  document.querySelector('.myList__title').innerHTML = currentList.textContent ?? 'Nueva lista';
   myListPage();
 });
 
@@ -473,8 +381,53 @@ document.querySelector('.createListBtn').addEventListener('click', () => {
   myListPage();
 });
 
+document.querySelector('#electronicsBtn').addEventListener('click', async() => {
+  try {
+    let data = await getfakestoreData('electronics')
+    setAvailableProductsList(data)
+    renderAvailableProducts(data);
+  }
+  catch(error) {
+    console.error(error);
+  }
+});
+
+document.querySelector('#jeweleryBtn').addEventListener('click', async() => {
+  try {
+    let data = await getfakestoreData('jewelery')
+    setAvailableProductsList(data)
+    renderAvailableProducts(data);
+  }
+  catch(error) {
+    console.error(error);
+  }
+});
+
+document.querySelector('#mensClothingBtn').addEventListener('click', async() => {
+  try {
+    let data = await getfakestoreData("men's clothing")
+    setAvailableProductsList(data)
+    renderAvailableProducts(data);
+  }
+  catch(error) {
+    console.error(error);
+  }
+});
+
+document.querySelector('#womensClothingBtn').addEventListener('click', async() => {
+  try {
+    let data = await getfakestoreData("women's clothing")
+    setAvailableProductsList(data)
+    renderAvailableProducts(data);
+  }
+  catch(error) {
+    console.error(error);
+  }
+});
+// document.querySelector('#jeweleryBtn').addEventListener('click', );
+// document.querySelector('#mensClothingBtn').addEventListener('click', );
+// document.querySelector('#womensClothingBtn').addEventListener('click', );
 document.querySelector('#form__newListName').addEventListener('submit', handleChangelistName);
 document.querySelector('#signIn').addEventListener('click', userSignIn);
 document.querySelector('#logOut').addEventListener('click', userSignOut);
-document.querySelector('#googleBtn').addEventListener('click', signInWithGoogle);
 document.querySelector('#signUp').addEventListener('click', dataToSignUp);
