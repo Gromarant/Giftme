@@ -147,7 +147,7 @@ const userSignOut = async () => {
   });
 };
 
-// //-------------------User state
+// -------------------User state
 firebase.auth().onAuthStateChanged( user => {
   if (user) {
     setMyListsPage();
@@ -158,7 +158,7 @@ firebase.auth().onAuthStateChanged( user => {
   }
 });
 
-// //--------------Datos de registro
+// --------------Datos de registro
 const dataToSignUp = () => {
 
   const email = (userEmail.value ?? '').trim();
@@ -205,8 +205,8 @@ function formValidation(email, password) {
   return validated;
 }
 
-// //-------------------Request
-const getfakestoreData = async(category) => {
+ //-------------------Request
+const getProductsByCategory = async(category) => {
   try {
     return fetch(`https://fakestoreapi.com/products/category/${category}`)
     .then(res => res.json())
@@ -289,7 +289,7 @@ function createCard(item) {
   spanAdd.className = 'iconify addBtn';
   spanAdd.setAttribute('data-icon', 'flat-color-icons:plus');
 
-  spanAdd.addEventListener('click', () => console.log('sumar uno'))
+  spanAdd.addEventListener('click', () => console.log('sumar uno'));
   
   
   divProduct.appendChild(titleProduct);
@@ -368,7 +368,7 @@ function setVisibleSection(targetSectionId) {
 
 function showInitialPage() {
   hideElements(['#logOut', '.createListBtn', '.myListSearchBtn', '.goToListsBtn', '#lists', '#newList', '#myList', '#search'])
-  displayElements(['#form_registration']);
+  displayElements(['#banner', '#form_registration']);
 }
 
 function setNewListPage() {
@@ -381,7 +381,7 @@ function setMyListPage() {
   document.querySelector('#myList__title').innerHTML = 'Lista: ' + currentList.listName;
   renderListItems(currentList);
   hideElements(['#banner', '#signUp','#signIn', '.myListSearchBtn', '#newList', '.createListBtn', '#lists'])
-  displayElements(['#myList', '#logOut'])
+  displayElements(['#myList', '#logOut', '#goToSearchProductsBtn'])
 }
 
 function setMyListsPage() {
@@ -402,14 +402,18 @@ function displayElements(selectors) {
   selectors.forEach(selector => document.querySelector(selector).classList.remove('hidden'));
 }
 
+async function displayProducts(category) {
+  const products = await getProductsByCategory(category);
+  renderAvailableProducts(products);
+}
+
 document.querySelector('#logOut').addEventListener('click', () => {
   userSignOut();
-  hideElements(['#logOut', '.createListBtn', '#lists', '#myList', '#newList'])
-  displayElements(['#banner', '#form_registration', '#signUp', '#signIn'])
+  showInitialPage();
 });
 document.querySelector('.createListBtn').addEventListener('click', setNewListPage);
 document.querySelector('.goToListsBtn').addEventListener('click', setMyListPage);
-document.querySelector('.myListSearchBtn').addEventListener('click', setSearchPage);
+document.querySelector('#goToSearchProductsBtn').addEventListener('click', setSearchPage);
 document.querySelector('#electronicsBtn').addEventListener('click', async() => displayProducts('electronics'))
 document.querySelector('#jeweleryBtn').addEventListener('click', async() => displayProducts('jewelery'));
 document.querySelector('#mensClothingBtn').addEventListener('click', async() => displayProducts("men's clothing"));
