@@ -9,14 +9,14 @@ let myLists = [
         description: 'Un pingüinote',
         id: 87,
         image: '',
-        quantity: 2,
+        quantity: 4,
         category: 'Animalotes'
       },
       {
         title: 'Jirafota',
         price: 15,
         description: 'Un jirafota',
-        id: 87,
+        id: 88,
         image: '',
         quantity: 2,
         category: 'Animalotes'
@@ -32,7 +32,7 @@ let myLists = [
         description: 'Un pingüinote',
         id: 87,
         image: '',
-        quantity: 2,
+        quantity: 7,
         category: 'Animalotes'
       }
     ]
@@ -275,21 +275,41 @@ function createCard(item) {
   quantity.className = 'quantity__buttons';
 
   //quantity__Buttons
+  const subtractButtonContainer = document.createElement('div')
   const spanMenus = document.createElement('span');
   spanMenus.className = 'iconify sustract';
   spanMenus.setAttribute('data-icon', 'iconamoon:sign-minus-circle');
-  
-  spanMenus.addEventListener('click', () => console.log('quitar uno'))
+  subtractButtonContainer.appendChild(spanMenus)
+  subtractButtonContainer.addEventListener('click', () => {
+     removeItem(item, currentList);
+     renderLists(myLists);
+     renderAvailableProducts(availableProductList);
+  })
 
   const quantityP = document.createElement('p');
   quantityP.className = 'quantity';
-  quantityP.innerHTML = item.quantity;
+  
+  let itemQuantity;
+  if (item.quantity) {
+    itemQuantity = item.quantity;
+  } else if (currentList.items.find(itemInList => itemInList.id === item.id)) {
+    itemQuantity = currentList.items.find(itemInList => itemInList.id === item.id).quantity;
+  } else {
+    itemQuantity = 0;
+  }
+  quantityP.innerHTML = itemQuantity;
 
+  const addButtonContainer = document.createElement('div')
   const spanAdd = document.createElement('span');
   spanAdd.className = 'iconify addBtn';
   spanAdd.setAttribute('data-icon', 'flat-color-icons:plus');
+  addButtonContainer.appendChild(spanAdd);
 
-  spanAdd.addEventListener('click', () => console.log('sumar uno'));
+  addButtonContainer.addEventListener('click', () => {
+    addItem(item, currentList);
+    renderLists(myLists);
+    renderAvailableProducts(availableProductList);
+  });
   
   
   divProduct.appendChild(titleProduct);
@@ -301,9 +321,9 @@ function createCard(item) {
   divPrice.appendChild(price);
   divPrice.appendChild(quantity);
  
-  quantity.appendChild(spanMenus);
+  quantity.appendChild(subtractButtonContainer);
   quantity.appendChild(quantityP);
-  quantity.appendChild(spanAdd);
+  quantity.appendChild(addButtonContainer);
 
   // Cardwrapper
   const wrapper = document.createElement('article');
@@ -366,33 +386,53 @@ function setVisibleSection(targetSectionId) {
   })
 }
 
+function addItem(newItem, list) {
+  console.log(newItem, list);
+  const itemInList = list.items.find(item => item.id === newItem.id);
+  if (itemInList) {
+    itemInList.quantity++;
+  } else {
+    list.items.push(newItem);
+  }
+}
+
+function removeItem(itemToRemove, list) {
+  const itemInList = list.items.find(item => item.id === itemToRemove.id);
+  if (itemInList) {
+    itemInList.quantity--;
+    if (itemInList.quantity <= 0) {
+      list.items = list.items.filter(item => item.id !== itemToRemove.id);
+    }
+  }
+}
+
 function showInitialPage() {
-  hideElements(['#logOut', '.createListBtn', '.myListSearchBtn', '.goToListsBtn', '#lists', '#newList', '#myList', '#search'])
+  hideElements(['#logOut', '.createListBtn', '.myListSearchBtn', '.goToListsBtn', '#lists', '#newList', '#myList', '#search', '#goToSearchProductsBtn', '#goToMyListBtn'])
   displayElements(['#banner', '#form_registration']);
 }
 
 function setNewListPage() {
   document.querySelector('#newListName').value = '';
-  hideElements(['#banner', '#signUp','#signIn', '#myList', '.myListSearchBtn', '#lists', '.createListBtn'])
+  hideElements(['#banner', '#signUp','#signIn', '#myList', '.myListSearchBtn', '#lists', '.createListBtn', '#goToSearchProductsBtn', '#goToMyListBtn'])
   displayElements(['#newList', '#logOut'])
 }
 
 function setMyListPage() {
   document.querySelector('#myList__title').innerHTML = 'Lista: ' + currentList.listName;
   renderListItems(currentList);
-  hideElements(['#banner', '#signUp','#signIn', '.myListSearchBtn', '#newList', '.createListBtn', '#lists'])
-  displayElements(['#myList', '#logOut', '#goToSearchProductsBtn'])
+  hideElements(['#banner', '#signUp','#signIn', '.myListSearchBtn', '#newList', '.createListBtn', '#lists', '#search','#goToMyListBtn'])
+  displayElements(['#myList', '#logOut', '#goToSearchProductsBtn', '.goToListsBtn'])
 }
 
 function setMyListsPage() {
-  hideElements(['#banner', '#form_registration', '#signUp', '#signIn', '#myList', '#newList'])
+  hideElements(['#banner', '#form_registration', '#signUp', '#signIn', '#myList', '#newList', '#goToSearchProductsBtn', '#goToMyListBtn', '.goToListsBtn', '#goToMyListBtn'])
   displayElements(['#lists', '#logOut', '.createListBtn'])
   renderLists(myLists)
 }
 
 function setSearchPage() {
-  hideElements(['.createListBtn', '#myList', '#newList'])
-  displayElements(['#search','.myListSearchBtn', '#logOut', '.goToListsBtn'])
+  hideElements(['.createListBtn', '#myList', '#newList', '#goToSearchProductsBtn', '.goToListsBtn'])
+  displayElements(['#search','.myListSearchBtn', '#logOut', '#goToMyListBtn'])
 }
 
 function hideElements(selectors) {
@@ -412,7 +452,7 @@ document.querySelector('#logOut').addEventListener('click', () => {
   showInitialPage();
 });
 document.querySelector('.createListBtn').addEventListener('click', setNewListPage);
-document.querySelector('.goToListsBtn').addEventListener('click', setMyListPage);
+document.querySelector('.goToListsBtn').addEventListener('click', setMyListsPage);
 document.querySelector('#goToSearchProductsBtn').addEventListener('click', setSearchPage);
 document.querySelector('#electronicsBtn').addEventListener('click', async() => displayProducts('electronics'))
 document.querySelector('#jeweleryBtn').addEventListener('click', async() => displayProducts('jewelery'));
@@ -421,7 +461,7 @@ document.querySelector('#womensClothingBtn').addEventListener('click', async() =
 document.querySelector('#signIn').addEventListener('click', userSignIn);
 document.querySelector('#logOut').addEventListener('click', userSignOut);
 document.querySelector('#signUp').addEventListener('click', dataToSignUp);
-document.querySelectorAll('.backToMyLists').forEach(button => button.addEventListener('click', setMyListsPage));
+document.querySelectorAll('.goToMyListBtn').forEach(button => button.addEventListener('click', setMyListPage));
 document.querySelector('#saveNewListButton').addEventListener('click', () => {
   const newListName = document.querySelector('#newListName').value;
   const newList = {
